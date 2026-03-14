@@ -78,7 +78,7 @@ struct EditorView: View {
         }
         .navigationTitle("水印编辑")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: config) { _, _ in updatePreview() }
+        .onChange(of: config) { _ in updatePreview() }
         .onAppear { updatePreview() }
         .alert("导出完成 🎉", isPresented: $exportDone) {
             Button("好的") {}
@@ -172,13 +172,5 @@ struct PositionGrid: View {
                 }
             }
         }
-    }
-}
-
-// MARK: - Preview
-
-#Preview {
-    NavigationStack {
-        EditorView(images: [UIImage(systemName: "photo")!])
     }
 }

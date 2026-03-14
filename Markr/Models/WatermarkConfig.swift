@@ -57,7 +57,7 @@ struct WatermarkConfig: Equatable {
     var text: String       = "© Markr"
     var fontSize: CGFloat  = 28
     var color: Color       = .white
-    var opacity: Double    = 0.8
+    var opacity: CGFloat   = 0.8
     var position: WatermarkPosition = .bottomRight
     /// 拖拽微调偏移
     var dragOffset: CGSize = .zero

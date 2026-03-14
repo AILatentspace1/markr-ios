@@ -1,3 +1,10 @@
+//
+//  MarkrApp.swift
+//  Markr
+//
+//  Created by Gary Liu on 3/14/26.
+//
+
 import SwiftUI
 
 @main

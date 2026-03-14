@@ -43,7 +43,7 @@ struct HomeView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
                     .padding(.horizontal, 32)
-                    .onChange(of: pickerItems) { _, newItems in
+                    .onChange(of: pickerItems) { newItems in
                         loadImages(from: newItems)
                     }
 
@@ -87,10 +87,4 @@ struct HomeView: View {
             }
         }
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    HomeView()
 }
