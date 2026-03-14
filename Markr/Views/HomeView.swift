@@ -68,22 +68,60 @@ struct HomeView: View {
         images = []
         let group = DispatchGroup()
 
-        for item in items {
+        print("📝 开始加载 \(items.count) 张图片")
+
+        for (index, item) in items.enumerated() {
             group.enter()
+            print("🔄 正在加载第 \(index + 1) 张图片...")
+
+            // 方法1: 尝试加载 Data
             item.loadTransferable(type: Data.self) { result in
                 defer { group.leave() }
-                if case .success(let data) = result,
-                   let data, let img = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        images.append(img)
+                switch result {
+                case .success(let data):
+                    if let data, let img = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            images.append(img)
+                            print("✅ 第 \(index + 1) 张图片加载成功")
+                        }
+                    } else {
+                        print("⚠️ 第 \(index + 1) 张: 无法从数据创建 UIImage")
+                        // 方法2: 尝试直接加载 UIImage
+                        self.loadImageAsUIImage(from: item, index: index)
                     }
+                case .failure(let error):
+                    print("❌ 第 \(index + 1) 张: Data 加载失败 - \(error.localizedDescription)")
+                    // 方法2: 尝试直接加载 UIImage
+                    self.loadImageAsUIImage(from: item, index: index)
                 }
             }
         }
 
         group.notify(queue: .main) {
+            print("📸 加载完成，共 \(images.count) 张图片")
             if !images.isEmpty {
                 showEditor = true
+            } else {
+                print("⚠️ 没有成功加载任何图片")
+            }
+        }
+    }
+
+    // 备用方法: 直接加载 UIImage
+    private func loadImageAsUIImage(from item: PhotosPickerItem, index: Int) {
+        item.loadTransferable(type: UIImage.self) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let uiimage):
+                    if let img = uiimage {
+                        self.images.append(img)
+                        print("✅ 第 \(index + 1) 张图片 (备用方法) 加载成功")
+                    } else {
+                        print("❌ 第 \(index + 1) 张: UIImage 为 nil")
+                    }
+                case .failure(let error):
+                    print("❌ 第 \(index + 1) 张: UIImage 加载失败 - \(error.localizedDescription)")
+                }
             }
         }
     }
