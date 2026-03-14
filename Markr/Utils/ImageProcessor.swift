@@ -8,6 +8,12 @@ enum ImageProcessor {
         let scale = image.scale
         let size = image.size
 
+        // 根据图片尺寸动态计算实际字号
+        // 图片宽度越大，字号越大，保持相同的视觉比例
+        let referenceWidth: CGFloat = 1000  // 参考宽度
+        let scaleFactor = size.width / referenceWidth
+        let actualFontSize = config.fontSize * scaleFactor
+
         let renderer = UIGraphicsImageRenderer(size: size, format: {
             let f = UIGraphicsImageRendererFormat()
             f.scale = scale
@@ -18,7 +24,7 @@ enum ImageProcessor {
             // 1. 画原图
             image.draw(at: .zero)
 
-            // 2. 准备文字属性
+            // 2. 准备文字属性（使用动态计算的字号）
             let uiColor = UIColor(config.color).withAlphaComponent(config.opacity)
 
             // 添加阴影使水印更明显
@@ -28,13 +34,13 @@ enum ImageProcessor {
             shadow.shadowBlurRadius = 4
 
             let attrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: config.fontSize, weight: .bold),
+                .font: UIFont.systemFont(ofSize: actualFontSize, weight: .bold),
                 .foregroundColor: uiColor,
                 .shadow: shadow
             ]
 
             let textSize = (config.text as NSString).size(withAttributes: attrs)
-            let padding: CGFloat = 20
+            let padding: CGFloat = 20 * scaleFactor  // 边距也按比例缩放
 
             // 3. 根据九宫格位置计算原点
             let origin = textOrigin(
