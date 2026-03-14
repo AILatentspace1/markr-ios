@@ -10,64 +10,72 @@ struct EditorView: View {
     @State private var exportDone = false
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 20) {
 
-                // MARK: 预览区
-                Group {
-                    if let displayImage = previewImage ?? (images.isEmpty ? nil : images[0]) {
-                        PreviewCanvas(image: displayImage, config: config)
-                    } else {
-                        Text("暂无图片")
-                            .frame(maxWidth: .infinity)
-                            .background(Color(.systemGray6))
-                    }
-                }
-                .frame(height: 280)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .padding(.horizontal)
-
-                // MARK: 水印文字
-                GroupBox("水印文字") {
-                    TextField("输入水印内容", text: $config.text)
-                        .textFieldStyle(.roundedBorder)
-                }
-                .padding(.horizontal)
-
-                // MARK: 字号 & 透明度
-                GroupBox("样式") {
-                    VStack(spacing: 12) {
-                        LabeledSlider(label: "字号", value: $config.fontSize, range: 12...72, format: "%.0f pt")
-                        LabeledSlider(label: "透明度", value: $config.opacity, range: 0.1...1.0, format: "%.0f%%", scale: 100)
-                    }
-                }
-                .padding(.horizontal)
-
-                // MARK: 颜色
-                GroupBox("颜色") {
-                    HStack(spacing: 12) {
-                        ForEach([Color.white, .black, .yellow, .red, .blue, .green], id: \.self) { c in
-                            Circle()
-                                .fill(c)
-                                .frame(width: 32, height: 32)
-                                .overlay(Circle().stroke(config.color == c ? Color.accentColor : .clear, lineWidth: 3))
-                                .onTapGesture { config.color = c }
+                    // MARK: 预览区
+                    Group {
+                        if let displayImage = previewImage ?? (images.isEmpty ? nil : images[0]) {
+                            PreviewCanvas(image: displayImage, config: config)
+                        } else {
+                            Text("暂无图片")
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6))
                         }
-                        Spacer()
-                        ColorPicker("", selection: $config.color)
-                            .labelsHidden()
                     }
-                }
-                .padding(.horizontal)
+                    .frame(height: 280)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal)
 
-                // MARK: 九宫格位置
-                GroupBox("位置") {
-                    PositionGrid(selection: $config.position)
-                        .padding(.vertical, 8)
-                }
-                .padding(.horizontal)
+                    // MARK: 水印文字
+                    GroupBox("水印文字") {
+                        TextField("输入水印内容", text: $config.text)
+                            .textFieldStyle(.roundedBorder)
+                    }
+                    .padding(.horizontal)
 
-                // MARK: 导出按钮
+                    // MARK: 字号 & 透明度
+                    GroupBox("样式") {
+                        VStack(spacing: 12) {
+                            LabeledSlider(label: "字号", value: $config.fontSize, range: 12...72, format: "%.0f pt")
+                            LabeledSlider(label: "透明度", value: $config.opacity, range: 0.1...1.0, format: "%.0f%%", scale: 100)
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    // MARK: 颜色
+                    GroupBox("颜色") {
+                        HStack(spacing: 12) {
+                            ForEach([Color.white, .black, .yellow, .red, .blue, .green], id: \.self) { c in
+                                Circle()
+                                    .fill(c)
+                                    .frame(width: 32, height: 32)
+                                    .overlay(Circle().stroke(config.color == c ? Color.accentColor : .clear, lineWidth: 3))
+                                    .onTapGesture { config.color = c }
+                            }
+                            Spacer()
+                            ColorPicker("", selection: $config.color)
+                                .labelsHidden()
+                        }
+                    }
+                    .padding(.horizontal)
+
+                    // MARK: 九宫格位置
+                    GroupBox("位置") {
+                        PositionGrid(selection: $config.position)
+                            .padding(.vertical, 8)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.top, 16)
+                .padding(.bottom, 20)
+            }
+
+            // MARK: 导出按钮 - 固定在底部
+            VStack(spacing: 0) {
+                Divider()
+
                 Button {
                     exportImages()
                 } label: {
@@ -77,14 +85,13 @@ struct EditorView: View {
                         .padding(.vertical, 16)
                         .background(isExporting ? Color.gray : Color.indigo)
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(isExporting)
                 .padding(.horizontal, 32)
-                .padding(.bottom, 32)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
             }
-            .padding(.top, 16)
-            .padding(.bottom, 100)
+            .background(Color(.systemBackground))
         }
         .navigationTitle("水印编辑")
         .navigationBarTitleDisplayMode(.inline)
