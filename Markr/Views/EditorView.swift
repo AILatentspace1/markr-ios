@@ -79,10 +79,13 @@ struct EditorView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(isExporting)
-                .padding(.horizontal)
-                .padding(.bottom, 32)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 16)
+
+                Spacer(minLength: 80)
             }
             .padding(.top)
+            .padding(.bottom)
         }
         .navigationTitle("水印编辑")
         .navigationBarTitleDisplayMode(.inline)
