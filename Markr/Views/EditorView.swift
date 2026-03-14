@@ -38,7 +38,7 @@ struct EditorView: View {
                     // MARK: 字号 & 透明度
                     GroupBox("样式") {
                         VStack(spacing: 12) {
-                            LabeledSlider(label: "字号", value: $config.fontSize, range: 12...72, format: "%.0f pt")
+                            LabeledSlider(label: "字号", value: $config.fontSize, range: 20...150, format: "%.0f pt")
                             LabeledSlider(label: "透明度", value: $config.opacity, range: 0.1...1.0, format: "%.0f%%", scale: 100)
                         }
                     }
