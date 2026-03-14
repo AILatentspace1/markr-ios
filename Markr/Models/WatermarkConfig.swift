@@ -55,9 +55,9 @@ enum WatermarkPosition: String, CaseIterable, Identifiable, Equatable {
 
 struct WatermarkConfig: Equatable {
     var text: String       = "© Markr"
-    var fontSize: CGFloat  = 60  // 增大字号
-    var color: Color       = .red  // 使用醒目的红色
-    var opacity: CGFloat   = 1.0  // 不透明
+    var fontSize: CGFloat  = 50  // 较大的字号
+    var color: Color       = .white  // 白色水印 + 阴影
+    var opacity: CGFloat   = 0.9  // 高透明度
     var position: WatermarkPosition = .bottomRight
     /// 拖拽微调偏移
     var dragOffset: CGSize = .zero

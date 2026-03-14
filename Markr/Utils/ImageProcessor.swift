@@ -5,11 +5,8 @@ enum ImageProcessor {
 
     /// 将水印叠加到图片上，返回新图片
     static func apply(watermark config: WatermarkConfig, to image: UIImage) -> UIImage {
-        print("🎨 === ImageProcessor.apply 开始 ===")
-        print("   图片尺寸: \(image.size)")
-
         let scale = image.scale
-        let size  = image.size
+        let size = image.size
 
         let renderer = UIGraphicsImageRenderer(size: size, format: {
             let f = UIGraphicsImageRendererFormat()
@@ -17,43 +14,40 @@ enum ImageProcessor {
             return f
         }())
 
-        let result = renderer.image { ctx in
+        return renderer.image { ctx in
             // 1. 画原图
             image.draw(at: .zero)
-            print("   ✅ 原图已绘制")
 
-            // 2. === 在图片正中央画一个巨大的红色圆形 ===
-            let centerX = size.width / 2
-            let centerY = size.height / 2
-            let radius = min(size.width, size.height) * 0.3  // 图片尺寸的 30%
+            // 2. 准备文字属性
+            let uiColor = UIColor(config.color).withAlphaComponent(config.opacity)
 
-            ctx.cgContext.setFillColor(UIColor.red.cgColor)
-            ctx.cgContext.fillEllipse(in: CGRect(
-                x: centerX - radius,
-                y: centerY - radius,
-                width: radius * 2,
-                height: radius * 2
-            ))
-            print("   ✅ 中央红色圆形已绘制，半径: \(radius)")
+            // 添加阴影使水印更明显
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor.black.withAlphaComponent(0.6)
+            shadow.shadowOffset = CGSize(width: 2, height: 2)
+            shadow.shadowBlurRadius = 4
 
-            // 3. === 在红色圆形中央画白色文字 ===
             let attrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: radius * 0.5, weight: .bold),
-                .foregroundColor: UIColor.white
+                .font: UIFont.systemFont(ofSize: config.fontSize, weight: .bold),
+                .foregroundColor: uiColor,
+                .shadow: shadow
             ]
-            let text = "测试"
-            let textSize = text.size(withAttributes: attrs)
-            text.draw(at: CGPoint(
-                x: centerX - textSize.width / 2,
-                y: centerY - textSize.height / 2
-            ), withAttributes: attrs)
-            print("   ✅ 白色文字已绘制")
+
+            let textSize = (config.text as NSString).size(withAttributes: attrs)
+            let padding: CGFloat = 20
+
+            // 3. 根据九宫格位置计算原点
+            let origin = textOrigin(
+                textSize: textSize,
+                canvasSize: size,
+                position: config.position,
+                padding: padding,
+                dragOffset: config.dragOffset
+            )
+
+            // 4. 画文字
+            (config.text as NSString).draw(at: origin, withAttributes: attrs)
         }
-
-        print("   🎯 渲染完成，返回图片尺寸: \(result.size)")
-        print("🎨 === ImageProcessor.apply 结束 ===")
-
-        return result
     }
 
     // MARK: - 私有：计算文字坐标

@@ -39,7 +39,7 @@ struct EditorView: View {
                     // MARK: 字号 & 透明度
                     GroupBox("样式") {
                         VStack(spacing: 12) {
-                            LabeledSlider(label: "字号", value: $config.fontSize, range: 20...150, format: "%.0f pt")
+                            LabeledSlider(label: "字号", value: $config.fontSize, range: 20...100, format: "%.0f pt")
                             LabeledSlider(label: "透明度", value: $config.opacity, range: 0.1...1.0, format: "%.0f%%", scale: 100)
                         }
                     }
@@ -121,34 +121,21 @@ struct EditorView: View {
         isExporting = true
         Task.detached(priority: .userInitiated) {
             let config = self.config
-            print("📤 开始导出")
 
-            for (index, img) in images.enumerated() {
-                print("📷 第 \(index + 1) 张: 原图尺寸 \(img.size)")
-
+            for img in images {
                 let result = ImageProcessor.apply(watermark: config, to: img)
-                print("💾 第 \(index + 1) 张: 处理后尺寸 \(result.size)")
-
-                // 验证图片是否真的被修改了
-                let originalData = img.jpegData(compressionQuality: 0.9)
-                let resultData = result.jpegData(compressionQuality: 0.9)
-                print("📊 原图: \(originalData?.count ?? 0) bytes, 处理后: \(resultData?.count ?? 0) bytes")
-
-                // 使用 Photos 框架保存（更可靠）
                 do {
                     try await PHPhotoLibrary.shared().performChanges {
                         PHAssetChangeRequest.creationRequestForAsset(from: result)
                     }
-                    print("✅ 第 \(index + 1) 张保存成功（使用 PHPhotoLibrary）")
                 } catch {
-                    print("❌ 第 \(index + 1) 张保存失败: \(error)")
+                    print("❌ 保存失败: \(error.localizedDescription)")
                 }
             }
 
             await MainActor.run {
                 isExporting = false
                 exportDone = true
-                print("✅ 导出完成")
             }
         }
     }
