@@ -54,7 +54,7 @@ enum WatermarkPosition: String, CaseIterable, Identifiable, Equatable {
 // MARK: - Watermark Config
 
 struct WatermarkConfig: Equatable {
-    var text: String       = "© Markr"
+    var text: String       = "© Markr · 水印"
     var fontSize: CGFloat  = 50  // 较大的字号
     var color: Color       = .white  // 白色水印 + 阴影
     var opacity: CGFloat   = 0.9  // 高透明度

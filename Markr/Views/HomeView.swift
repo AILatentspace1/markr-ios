@@ -19,7 +19,7 @@ struct HomeView: View {
                         Image(systemName: "wand.and.stars")
                             .font(.system(size: 56))
                             .foregroundStyle(.indigo)
-                        Text("Markr")
+                        Text("Markr · 水印")
                             .font(.largeTitle.bold())
                         Text("一键给图片加水印")
                             .font(.subheadline)
