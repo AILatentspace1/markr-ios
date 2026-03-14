@@ -14,10 +14,18 @@ struct EditorView: View {
             VStack(spacing: 20) {
 
                 // MARK: 预览区
-                PreviewCanvas(image: previewImage ?? images[0], config: config)
-                    .frame(height: 280)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal)
+                Group {
+                    if let displayImage = previewImage ?? (images.isEmpty ? nil : images[0]) {
+                        PreviewCanvas(image: displayImage, config: config)
+                    } else {
+                        Text("暂无图片")
+                            .frame(maxWidth: .infinity)
+                            .background(Color(.systemGray6))
+                    }
+                }
+                .frame(height: 280)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal)
 
                 // MARK: 水印文字
                 GroupBox("水印文字") {
@@ -90,6 +98,7 @@ struct EditorView: View {
     // MARK: - 生成预览
 
     private func updatePreview() {
+        guard !images.isEmpty else { return }
         Task.detached(priority: .userInitiated) {
             let result = ImageProcessor.apply(watermark: config, to: images[0])
             await MainActor.run { previewImage = result }
