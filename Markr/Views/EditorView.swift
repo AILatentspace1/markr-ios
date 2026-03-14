@@ -119,13 +119,27 @@ struct EditorView: View {
     private func exportImages() {
         isExporting = true
         Task.detached(priority: .userInitiated) {
-            for img in images {
+            let config = self.config
+            print("📤 开始导出，水印配置: '\(config.text)' 字号=\(config.fontSize)")
+
+            for (index, img) in images.enumerated() {
+                print("📷 第 \(index + 1) 张: 原图尺寸 \(img.size)")
+
                 let result = ImageProcessor.apply(watermark: config, to: img)
+                print("💾 第 \(index + 1) 张: 处理后尺寸 \(result.size), 内存地址 \(Unmanaged.passUnretained(result).toOpaque())")
+
+                // 对比原图和处理后的图片
+                let originalData = img.jpegData(compressionQuality: 1.0)
+                let resultData = result.jpegData(compressionQuality: 1.0)
+                print("📊 第 \(index + 1) 张: 原图大小 \(originalData?.count ?? 0) bytes, 处理后 \(resultData?.count ?? 0) bytes")
+
                 UIImageWriteToSavedPhotosAlbum(result, nil, nil, nil)
             }
+
             await MainActor.run {
                 isExporting = false
                 exportDone = true
+                print("✅ 导出完成")
             }
         }
     }
