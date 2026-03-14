@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import Photos
 
 struct EditorView: View {
     let images: [UIImage]
@@ -120,20 +121,28 @@ struct EditorView: View {
         isExporting = true
         Task.detached(priority: .userInitiated) {
             let config = self.config
-            print("📤 开始导出，水印配置: '\(config.text)' 字号=\(config.fontSize)")
+            print("📤 开始导出")
 
             for (index, img) in images.enumerated() {
                 print("📷 第 \(index + 1) 张: 原图尺寸 \(img.size)")
 
                 let result = ImageProcessor.apply(watermark: config, to: img)
-                print("💾 第 \(index + 1) 张: 处理后尺寸 \(result.size), 内存地址 \(Unmanaged.passUnretained(result).toOpaque())")
+                print("💾 第 \(index + 1) 张: 处理后尺寸 \(result.size)")
 
-                // 对比原图和处理后的图片
-                let originalData = img.jpegData(compressionQuality: 1.0)
-                let resultData = result.jpegData(compressionQuality: 1.0)
-                print("📊 第 \(index + 1) 张: 原图大小 \(originalData?.count ?? 0) bytes, 处理后 \(resultData?.count ?? 0) bytes")
+                // 验证图片是否真的被修改了
+                let originalData = img.jpegData(compressionQuality: 0.9)
+                let resultData = result.jpegData(compressionQuality: 0.9)
+                print("📊 原图: \(originalData?.count ?? 0) bytes, 处理后: \(resultData?.count ?? 0) bytes")
 
-                UIImageWriteToSavedPhotosAlbum(result, nil, nil, nil)
+                // 使用 Photos 框架保存（更可靠）
+                do {
+                    try await PHPhotoLibrary.shared().performChanges {
+                        PHAssetChangeRequest.creationRequestForAsset(from: result)
+                    }
+                    print("✅ 第 \(index + 1) 张保存成功（使用 PHPhotoLibrary）")
+                } catch {
+                    print("❌ 第 \(index + 1) 张保存失败: \(error)")
+                }
             }
 
             await MainActor.run {
