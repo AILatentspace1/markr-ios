@@ -74,7 +74,6 @@ struct HomeView: View {
             group.enter()
             print("🔄 正在加载第 \(index + 1) 张图片...")
 
-            // 方法1: 尝试加载 Data
             item.loadTransferable(type: Data.self) { result in
                 defer { group.leave() }
                 switch result {
@@ -85,14 +84,10 @@ struct HomeView: View {
                             print("✅ 第 \(index + 1) 张图片加载成功")
                         }
                     } else {
-                        print("⚠️ 第 \(index + 1) 张: 无法从数据创建 UIImage")
-                        // 方法2: 尝试直接加载 UIImage
-                        self.loadImageAsUIImage(from: item, index: index)
+                        print("⚠️ 第 \(index + 1) 张: 数据为空或无法创建 UIImage")
                     }
                 case .failure(let error):
-                    print("❌ 第 \(index + 1) 张: Data 加载失败 - \(error.localizedDescription)")
-                    // 方法2: 尝试直接加载 UIImage
-                    self.loadImageAsUIImage(from: item, index: index)
+                    print("❌ 第 \(index + 1) 张加载失败: \(error.localizedDescription)")
                 }
             }
         }
@@ -102,26 +97,7 @@ struct HomeView: View {
             if !images.isEmpty {
                 showEditor = true
             } else {
-                print("⚠️ 没有成功加载任何图片")
-            }
-        }
-    }
-
-    // 备用方法: 直接加载 UIImage
-    private func loadImageAsUIImage(from item: PhotosPickerItem, index: Int) {
-        item.loadTransferable(type: UIImage.self) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let uiimage):
-                    if let img = uiimage {
-                        self.images.append(img)
-                        print("✅ 第 \(index + 1) 张图片 (备用方法) 加载成功")
-                    } else {
-                        print("❌ 第 \(index + 1) 张: UIImage 为 nil")
-                    }
-                case .failure(let error):
-                    print("❌ 第 \(index + 1) 张: UIImage 加载失败 - \(error.localizedDescription)")
-                }
+                print("⚠️ 没有成功加载任何图片，请确保模拟器中有照片")
             }
         }
     }
