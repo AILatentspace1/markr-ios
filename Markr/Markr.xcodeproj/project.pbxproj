@@ -306,6 +306,7 @@
 				DEVELOPMENT_TEAM = 99Z8N9H59F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Markr · 水印";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Markr 需要访问您的相册来选择要添加水印的图片";
 				INFOPLIST_KEY_NSPhotoPickerUsageDescription = "Markr 需要访问您的照片来添加水印";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -337,6 +338,7 @@
 				DEVELOPMENT_TEAM = 99Z8N9H59F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Markr · 水印";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Markr 需要访问您的相册来选择要添加水印的图片";
 				INFOPLIST_KEY_NSPhotoPickerUsageDescription = "Markr 需要访问您的照片来添加水印";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
