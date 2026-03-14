@@ -63,6 +63,7 @@ struct EditorView: View {
                 // MARK: 九宫格位置
                 GroupBox("位置") {
                     PositionGrid(selection: $config.position)
+                        .padding(.vertical, 8)
                 }
                 .padding(.horizontal)
 
@@ -80,12 +81,10 @@ struct EditorView: View {
                 }
                 .disabled(isExporting)
                 .padding(.horizontal, 32)
-                .padding(.bottom, 16)
-
-                Spacer(minLength: 80)
+                .padding(.bottom, 32)
             }
-            .padding(.top)
-            .padding(.bottom)
+            .padding(.top, 16)
+            .padding(.bottom, 100)
         }
         .navigationTitle("水印编辑")
         .navigationBarTitleDisplayMode(.inline)
@@ -178,11 +177,13 @@ struct PositionGrid: View {
                         let pos = WatermarkPosition.from(row: row, col: col)
                         RoundedRectangle(cornerRadius: 6)
                             .fill(selection == pos ? Color.indigo : Color(.systemGray5))
-                            .frame(height: 40)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
                             .onTapGesture { selection = pos }
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity)
     }
 }
