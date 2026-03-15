@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		EB7D50B82F651B3500475AA4 /* Markr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB7D50B82F651B3500475AA4 /* Markr · 水印.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Markr · 水印.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB7D50BB2F651B3500475AA4 /* MarkrApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkrApp.swift; sourceTree = "<group>"; };
 		EB7D50BF2F651B3800475AA4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EB7D50C22F651B3800475AA4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -49,7 +49,7 @@
 		EB7D50B92F651B3500475AA4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EB7D50B82F651B3500475AA4 /* Markr.app */,
+				EB7D50B82F651B3500475AA4 /* Markr · 水印.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,7 +117,7 @@
 			);
 			name = Markr;
 			productName = Markr;
-			productReference = EB7D50B82F651B3500475AA4 /* Markr.app */;
+			productReference = EB7D50B82F651B3500475AA4 /* Markr · 水印.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
