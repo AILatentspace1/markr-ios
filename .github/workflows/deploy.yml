@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
@@ -14,8 +14,8 @@ jobs:
       - name: Show available Xcode versions
         run: ls /Applications/ | grep Xcode
 
-      - name: Select Xcode 15.4
-        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+      - name: Select Xcode 16
+        run: sudo xcode-select -switch /Applications/Xcode_16.app
 
       - name: Xcode version check
         run: xcodebuild -version
