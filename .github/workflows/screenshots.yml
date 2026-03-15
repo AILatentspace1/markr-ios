@@ -1,0 +1,59 @@
+name: Take iPad Screenshots
+
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select latest Xcode 16
+        run: |
+          LATEST=$(ls /Applications/ | grep "^Xcode_16" | sort -V | tail -1)
+          echo "Using: $LATEST"
+          sudo xcode-select -switch /Applications/$LATEST
+
+      - name: Build for simulator
+        run: |
+          xcodebuild build \
+            -project Markr/Markr.xcodeproj \
+            -scheme Markr \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,name=iPad Pro 13-inch (M4)" \
+            PRODUCT_MODULE_NAME=Markr \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath $RUNNER_TEMP/DerivedData
+
+      - name: Boot iPad Pro 13-inch simulator
+        run: |
+          UDID=$(xcrun simctl list devices available | grep "iPad Pro 13-inch (M4)" | head -1 | grep -oE '[A-F0-9-]{36}')
+          echo "UDID: $UDID"
+          echo "SIMULATOR_UDID=$UDID" >> $GITHUB_ENV
+          xcrun simctl boot $UDID
+          sleep 10
+
+      - name: Install and launch app
+        run: |
+          APP_PATH=$(find $RUNNER_TEMP/DerivedData -name "Markr.app" -path "*/iphonesimulator*" | head -1)
+          echo "App: $APP_PATH"
+          xcrun simctl install $SIMULATOR_UDID "$APP_PATH"
+          xcrun simctl launch $SIMULATOR_UDID com.gary.markr
+          sleep 6
+
+      - name: Screenshot — Home View
+        run: |
+          mkdir -p $RUNNER_TEMP/screenshots
+          xcrun simctl io $SIMULATOR_UDID screenshot $RUNNER_TEMP/screenshots/ipad-13-home.png
+          echo "Home screenshot taken"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipad-screenshots
+          path: ${{ runner.temp }}/screenshots/
+          retention-days: 7
