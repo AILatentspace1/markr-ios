@@ -5,14 +5,14 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-14  # 内置 Xcode 15
+    runs-on: macos-14  # Xcode 15.4 默认
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode 15
-        run: sudo xcode-select -switch /Applications/Xcode_15.2.app
+      - name: Select Xcode 15.4
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
 
       - name: Set up signing
         env:
@@ -33,12 +33,21 @@ jobs:
             -P "$CERTIFICATE_PASSWORD" \
             -A -t cert -f pkcs12 \
             -k $KEYCHAIN_PATH
+
+          # 关键：放开 codesign 对 keychain 私钥的访问权限
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
           security list-keychain -d user -s $KEYCHAIN_PATH
 
           # 安装 Provisioning Profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode \
             > ~/Library/MobileDevice/Provisioning\ Profiles/markr.mobileprovision
+
+          # 验证证书已导入
+          security find-identity -v -p codesigning $KEYCHAIN_PATH
 
       - name: Build Archive
         run: |
@@ -48,7 +57,15 @@ jobs:
             -archivePath $RUNNER_TEMP/Markr.xcarchive \
             -destination "generic/platform=iOS" \
             CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="iPhone Distribution" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="Markr AppStore" \
+            | xcpretty || xcodebuild archive \
+            -project Markr/Markr.xcodeproj \
+            -scheme Markr \
+            -archivePath $RUNNER_TEMP/Markr.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE_SPECIFIER="Markr AppStore"
 
       - name: Export IPA
