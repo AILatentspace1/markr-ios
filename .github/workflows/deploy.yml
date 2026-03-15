@@ -1,18 +1,24 @@
 name: Deploy to App Store
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: macos-14  # Xcode 15.4 默认
+    runs-on: macos-14
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Show available Xcode versions
+        run: ls /Applications/ | grep Xcode
+
       - name: Select Xcode 15.4
         run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+
+      - name: Xcode version check
+        run: xcodebuild -version
 
       - name: Set up signing
         env:
@@ -20,46 +26,41 @@ jobs:
           CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
           PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
         run: |
-          # 创建临时 keychain
           KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          # 导入分发证书
           echo -n "$CERTIFICATE_BASE64" | base64 --decode > $RUNNER_TEMP/cert.p12
           security import $RUNNER_TEMP/cert.p12 \
             -P "$CERTIFICATE_PASSWORD" \
             -A -t cert -f pkcs12 \
             -k $KEYCHAIN_PATH
 
-          # 关键：放开 codesign 对 keychain 私钥的访问权限
           security set-key-partition-list \
             -S apple-tool:,apple:,codesign: \
             -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
           security list-keychain -d user -s $KEYCHAIN_PATH
 
-          # 安装 Provisioning Profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode \
             > ~/Library/MobileDevice/Provisioning\ Profiles/markr.mobileprovision
 
-          # 验证证书已导入
-          security find-identity -v -p codesigning $KEYCHAIN_PATH
+          echo "=== Signing identities found ==="
+          security find-identity -v -p codesigning
+
+          echo "=== Provisioning profile UUID ==="
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/markr.mobileprovision \
+            | grep -A1 UUID | tail -1
+
+      - name: List schemes
+        run: xcodebuild -project Markr/Markr.xcodeproj -list
 
       - name: Build Archive
         run: |
           xcodebuild archive \
-            -project Markr/Markr.xcodeproj \
-            -scheme Markr \
-            -archivePath $RUNNER_TEMP/Markr.xcarchive \
-            -destination "generic/platform=iOS" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="Markr AppStore" \
-            | xcpretty || xcodebuild archive \
             -project Markr/Markr.xcodeproj \
             -scheme Markr \
             -archivePath $RUNNER_TEMP/Markr.xcarchive \
