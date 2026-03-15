@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-13  # 内置 Xcode 15
+    runs-on: macos-14  # 内置 Xcode 15
 
     steps:
       - name: Checkout
