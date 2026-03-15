@@ -63,11 +63,9 @@ jobs:
           xcodebuild archive \
             -project Markr/Markr.xcodeproj \
             -scheme Markr \
+            -configuration Release \
             -archivePath $RUNNER_TEMP/Markr.xcarchive \
-            -destination "generic/platform=iOS" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="Markr AppStore"
+            -destination "generic/platform=iOS"
 
       - name: Export IPA
         run: |
