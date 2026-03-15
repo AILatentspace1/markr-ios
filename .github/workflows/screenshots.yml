@@ -27,7 +27,16 @@ jobs:
             -destination "platform=iOS Simulator,name=iPad Pro 13-inch (M4)" \
             PRODUCT_MODULE_NAME=Markr \
             CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
             -derivedDataPath $RUNNER_TEMP/DerivedData
+
+      - name: Find built app
+        run: |
+          echo "=== Searching for .app bundles ==="
+          find $RUNNER_TEMP/DerivedData -name "*.app" -type d | grep -v PlugIns | grep -v ".appex"
+          APP_PATH=$(find $RUNNER_TEMP/DerivedData -name "*.app" -type d | grep -v PlugIns | grep -v ".appex" | head -1)
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          echo "Will install: $APP_PATH"
 
       - name: Boot iPad Pro 13-inch simulator
         run: |
@@ -35,21 +44,21 @@ jobs:
           echo "UDID: $UDID"
           echo "SIMULATOR_UDID=$UDID" >> $GITHUB_ENV
           xcrun simctl boot $UDID
-          sleep 10
+          sleep 15
 
       - name: Install and launch app
         run: |
-          APP_PATH=$(find $RUNNER_TEMP/DerivedData -name "Markr.app" -path "*/iphonesimulator*" | head -1)
-          echo "App: $APP_PATH"
+          echo "Installing: $APP_PATH"
           xcrun simctl install $SIMULATOR_UDID "$APP_PATH"
           xcrun simctl launch $SIMULATOR_UDID com.gary.markr
-          sleep 6
+          sleep 8
 
-      - name: Screenshot — Home View
+      - name: Take screenshots
         run: |
           mkdir -p $RUNNER_TEMP/screenshots
           xcrun simctl io $SIMULATOR_UDID screenshot $RUNNER_TEMP/screenshots/ipad-13-home.png
-          echo "Home screenshot taken"
+          echo "Screenshot taken"
+          ls -lh $RUNNER_TEMP/screenshots/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
