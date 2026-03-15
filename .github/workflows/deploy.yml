@@ -84,9 +84,12 @@ jobs:
           echo -n "$API_KEY_CONTENT" | base64 --decode \
             > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
 
+          IPA_PATH=$(find $RUNNER_TEMP/export -name "*.ipa" | head -1)
+          echo "Uploading: $IPA_PATH"
+
           xcrun altool --upload-app \
             --type ios \
-            --file "$RUNNER_TEMP/export/Markr.ipa" \
+            --file "$IPA_PATH" \
             --apiKey "$API_KEY_ID" \
             --apiIssuer "$API_ISSUER_ID" \
             --verbose
