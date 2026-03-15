@@ -337,9 +337,11 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Markr/Preview Content\"";
 				DEVELOPMENT_TEAM = 99Z8N9H59F;
-				PROVISIONING_PROFILE_SPECIFIER = "Markr AppStore";
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_MODULE_NAME = Markr;
+				PROVISIONING_PROFILE_SPECIFIER = "Markr AppStore";
 				INFOPLIST_KEY_CFBundleDisplayName = "Markr · 水印";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Markr 需要访问您的相册来选择要添加水印的图片";
 				INFOPLIST_KEY_NSPhotoPickerUsageDescription = "Markr 需要访问您的照片来添加水印";
